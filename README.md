@@ -28,8 +28,7 @@ qau-thesis-final-zhu/
 ├── appendices/                  % 附录
 ├── backmatter/                  % 导师组意见、致谢、简历、成果目录
 ├── figures/                     % 正文图片
-├── assets/                      % 封面资源等
-└── demo-*.tex                   % 若干独立示例文件
+└── assets/                      % 封面资源等
 ```
 
 ## 使用方法
