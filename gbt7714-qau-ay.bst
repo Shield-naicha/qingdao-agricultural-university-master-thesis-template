@@ -141,7 +141,7 @@ ENTRY
     year
   }
   { entry.lang entry.is.electronic is.pure.electronic entry.numbered }
-  { label extra.label sort.label short.label short.list entry.mark entry.url }
+  { label extra.label sort.label short.label short.list alt.label alt.short.label alt.short.list entry.mark entry.url }
 
 INTEGERS { output.state before.all mid.sentence after.sentence after.block after.slash }
 
@@ -2191,35 +2191,42 @@ FUNCTION {format.lab.name}
   if$
 }
 
-FUNCTION {format.lab.names}
+FUNCTION {format.lab.names.base}
 { 's :=
-  s #1 format.lab.name 'short.label :=
-  #1 'nameptr :=
   s num.names$ 'numnames :=
-  ""
-  numnames 'namesleft :=
-    { namesleft #0 > }
-    { s nameptr format.lab.name citation.et.al =
-      numnames citation.et.al.min #1 - > nameptr citation.et.al.use.first > and or
-        { bbl.space *
-          citation.et.al *
-          #1 'namesleft :=
+  numnames #1 =
+    { s #1 format.lab.name }
+    { numnames #2 =
+        { entry.lang lang.en =
+            { s #1 format.lab.name " \& " * s #2 format.lab.name * }
+            { s #1 format.lab.name ", " * s #2 format.lab.name * }
+          if$
         }
-        { nameptr #1 >
-            { namesleft #1 = citation.and "" = not and
-                { citation.and * }
-                { ", " * }
+        { numnames #3 =
+            { entry.lang lang.en =
+                { s #1 format.lab.name ", " * s #2 format.lab.name * ", \& " * s #3 format.lab.name * }
+                { s #1 format.lab.name ", " * s #2 format.lab.name * ", " * s #3 format.lab.name * }
               if$
             }
-            'skip$
+            { s #1 format.lab.name bbl.space * citation.et.al * }
           if$
-          s nameptr format.lab.name *
         }
       if$
-      nameptr #1 + 'nameptr :=
-      namesleft #1 - 'namesleft :=
     }
-  while$
+  if$
+}
+
+FUNCTION {format.lab.names.alt}
+{ 's :=
+  s num.names$ 'numnames :=
+  numnames #3 >
+    { entry.lang lang.en =
+        { s #1 format.lab.name ", " * s #2 format.lab.name * ", " * citation.et.al * }
+        { s #1 format.lab.name ", " * s #2 format.lab.name * bbl.space * citation.et.al * }
+      if$
+    }
+    { s format.lab.names.base }
+  if$
 }
 
 FUNCTION {author.key.label}
@@ -2229,7 +2236,7 @@ FUNCTION {author.key.label}
         'key
       if$
     }
-    { author format.lab.names }
+    { author format.lab.names.base }
   if$
 }
 
@@ -2241,10 +2248,10 @@ FUNCTION {author.editor.key.label}
             'key
           if$
         }
-        { editor format.lab.names }
+        { editor format.lab.names.base }
       if$
     }
-    { author format.lab.names }
+    { author format.lab.names.base }
   if$
 }
 
@@ -2259,7 +2266,7 @@ FUNCTION {author.key.organization.label}
         'key
       if$
     }
-    { author format.lab.names }
+    { author format.lab.names.base }
   if$
 }
 
@@ -2274,11 +2281,67 @@ FUNCTION {editor.key.organization.label}
         'key
       if$
     }
-    { editor format.lab.names }
+    { editor format.lab.names.base }
   if$
 }
 
-FUNCTION {calc.short.authors}
+FUNCTION {author.key.label.alt}
+{ author empty$
+    { key empty$
+        { cite$ #1 #3 substring$ }
+        'key
+      if$
+    }
+    { author format.lab.names.alt }
+  if$
+}
+
+FUNCTION {author.editor.key.label.alt}
+{ author empty$
+    { editor empty$
+        { key empty$
+            { cite$ #1 #3 substring$ }
+            'key
+          if$
+        }
+        { editor format.lab.names.alt }
+      if$
+    }
+    { author format.lab.names.alt }
+  if$
+}
+
+FUNCTION {author.key.organization.label.alt}
+{ author empty$
+    { key empty$
+        { organization empty$
+            { cite$ #1 #3 substring$ }
+            { "The " #4 organization chop.word #3 text.prefix$ }
+          if$
+        }
+        'key
+      if$
+    }
+    { author format.lab.names.alt }
+  if$
+}
+
+FUNCTION {editor.key.organization.label.alt}
+{ editor empty$
+    { key empty$
+        { organization empty$
+            { cite$ #1 #3 substring$ }
+            { "The " #4 organization chop.word #3 text.prefix$ }
+          if$
+        }
+        'key
+      if$
+    }
+    { editor format.lab.names.alt }
+  if$
+}
+
+FUNCTION {calc.short.authors.base}
 { "" 'short.label :=
   type$ "book" =
   type$ "inbook" =
@@ -2301,6 +2364,40 @@ FUNCTION {calc.short.authors}
     { short.list 'short.label := }
     'skip$
   if$
+}
+
+FUNCTION {calc.short.authors.alt}
+{ "" 'alt.short.label :=
+  type$ "book" =
+  type$ "inbook" =
+  or
+    'author.editor.key.label.alt
+    { type$ "collection" =
+      type$ "proceedings" =
+      or
+        { editor empty$ not
+            'editor.key.organization.label.alt
+            'author.key.organization.label.alt
+          if$
+        }
+        'author.key.label.alt
+      if$
+    }
+  if$
+  'alt.short.list :=
+  alt.short.label empty$
+    { alt.short.list 'alt.short.label := }
+    'skip$
+  if$
+}
+
+FUNCTION {calc.short.authors}
+{ "" 'short.list :=
+  "" 'short.label :=
+  "" 'alt.short.list :=
+  "" 'alt.short.label :=
+  calc.short.authors.base
+  calc.short.authors.alt
 }
 
 FUNCTION {calc.label}
@@ -2332,6 +2429,33 @@ FUNCTION {calc.label}
   if$
   *
   'short.label :=
+  alt.short.list "]" contains
+    { "{" alt.short.list * "}" * }
+    { alt.short.list }
+  if$
+  "("
+  *
+  format.year duplicate$ empty$
+  alt.short.list key field.or.null = or
+     { pop$ "" }
+     'skip$
+  if$
+  duplicate$ "]" contains
+    { "{" swap$ * "}" * }
+    'skip$
+  if$
+  *
+  'alt.label :=
+  alt.short.label
+  "("
+  *
+  format.year duplicate$ empty$
+  alt.short.list key field.or.null = or
+     { pop$ "" }
+     'skip$
+  if$
+  *
+  'alt.short.label :=
 }
 
 FUNCTION {sort.language.label}
@@ -2553,6 +2677,24 @@ FUNCTION {forward.pass}
   number.label #1 + 'number.label :=
 }
 
+FUNCTION {apply.alt.labels}
+{
+  next.extra empty$ not
+  extra.label empty$ not or
+    { alt.short.label empty$
+        'skip$
+        {
+          alt.label 'label :=
+          alt.short.label 'short.label :=
+          alt.short.list 'short.list :=
+        }
+      if$
+    }
+    'skip$
+  if$
+  extra.label 'next.extra :=
+}
+
 FUNCTION {reverse.pass}
 {
   next.extra "b" =
@@ -2626,6 +2768,12 @@ EXECUTE {load.config}
 ITERATE {presort}
 
 SORT
+
+EXECUTE {initialize.longest.label}
+
+ITERATE {forward.pass}
+
+REVERSE {apply.alt.labels}
 
 EXECUTE {initialize.longest.label}
 
