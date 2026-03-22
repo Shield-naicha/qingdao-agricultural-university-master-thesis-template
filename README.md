@@ -1,28 +1,24 @@
 # 青岛农业大学硕士毕业论文 LaTeX 模板（非官方）
 
-本仓库提供一个面向**青岛农业大学硕士学位论文**排版的 LaTeX 模板，适用于中文封面、英文扉页、声明、中英文摘要、目录、正文、参考文献、附录、导师组意见、致谢、作者简历和在读期间科研学术成果目录等常见组成部分。
+本仓库提供一个面向**青岛农业大学硕士学位论文**排版的 LaTeX 模板。
 
 > 说明：本模板为个人整理与开发版本，**非青岛农业大学官方发布**。正式提交前，请务必再次对照学校最新学位论文格式要求、学院补充规定和导师意见进行核查。
 
 ## 模板特点
 
-- 中文封面与英文扉页分离，便于单独调整
 - 支持**学术型硕士 / 专业型硕士**两套封面信息切换
-- 统一设置页边距、页眉页脚、章节标题、目录、图表题、附录和参考文献版式
 - 默认采用 **GB/T 7714 著者-年份制** 参考文献样式
-- 附带示例章节、附录 A/B、致谢、作者简历和科研成果目录
-- 尽量兼顾 Windows / macOS / Linux 的 XeLaTeX 编译环境
 
 ## 目录结构
 
 ```text
 qau-thesis-final-zhu/
-├── main.tex                      % 主控文件
+├── main.tex                     % 主控文件
 ├── qau-thesis.sty               % 样式文件
 ├── qau-cover-info.tex           % 封面与扉页信息总表
 ├── ref.bib                      % 参考文献数据库
-├── gbt7714-qau.bst             % 顺序编码制样式
-├── gbt7714-qau-ay.bst          % 著者-年份制样式（默认）
+├── gbt7714-qau.bst              % 顺序编码制样式
+├── gbt7714-qau-ay.bst           % 著者-年份制样式（默认）
 ├── frontmatter/                 % 封面、扉页、摘要、目录等前置部分
 ├── chapters/                    % 正文章节
 ├── appendices/                  % 附录
@@ -54,13 +50,6 @@ qau-thesis-final-zhu/
 
 默认图片目录为：
 - `figures/`：正文插图
-- `assets/`：封面或其他静态资源
-
-`main.tex` 中已设置：
-
-```tex
-\graphicspath{{figures/}{assets/}}
-```
 
 ### 4. 管理参考文献
 
@@ -82,26 +71,6 @@ qau-thesis-final-zhu/
 
 推荐使用 **XeLaTeX + BibTeX + XeLaTeX + XeLaTeX**。
 
-命令行示例：
-
-```bash
-xelatex main.tex
-bibtex main
-xelatex main.tex
-xelatex main.tex
-```
-
-若 Linux 环境中 `bibtex` 软链接异常，也可以临时改用：
-
-```bash
-bibtexu main
-```
-
-若安装了 `latexmk`，也可使用：
-
-```bash
-latexmk -xelatex main.tex
-```
 
 ## 关键文件说明
 
