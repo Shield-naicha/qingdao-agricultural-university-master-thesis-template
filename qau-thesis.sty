@@ -27,13 +27,23 @@
 \newCJKfontfamily\QAUkaiTitle{KaiTi}[AutoFakeBold=2.2]
 
 % ---------- western font fallback ----------
-% 英文字体按“Times New Roman -> Tinos -> TeX Gyre Termes”顺序回退，
-% 以减少不同系统下因缺字库导致的编译失败。
+% 英文字体按“Times New Roman -> Tinos -> TeX Gyre Termes”顺序回退。
+% 同时把西文主字体一并设为同一字体，以确保中文段落中夹杂的英文、数字、
+% 拉丁字母缩写和著者年份等内容也统一显示为 Times 系字体。
 \IfFontExistsTF{Times New Roman}
-  {\newfontfamily\qauTimes{Times New Roman}}
+  {
+    \setmainfont{Times New Roman}
+    \newfontfamily\qauTimes{Times New Roman}
+  }
   {\IfFontExistsTF{Tinos}
-    {\newfontfamily\qauTimes{Tinos}}
-    {\newfontfamily\qauTimes{TeX Gyre Termes}}}
+    {
+      \setmainfont{Tinos}
+      \newfontfamily\qauTimes{Tinos}
+    }
+    {
+      \setmainfont{TeX Gyre Termes}
+      \newfontfamily\qauTimes{TeX Gyre Termes}
+    }}
 \IfFontExistsTF{Monotype Corsiva}
   {\newfontfamily\qauCorsiva{Monotype Corsiva}}
   {\IfFontExistsTF{TeX Gyre Chorus}
